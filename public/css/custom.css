@@ -1,0 +1,141 @@
+/* Akuko Blog Custom Styles */
+
+/* Custom variables */
+:root {
+    --akuko-primary: #2563eb;
+    --akuko-primary-dark: #1d4ed8;
+    --akuko-light: #f8f9fa;
+    --akuko-dark: #212529;
+}
+
+/* Body and typography */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--akuko-light);
+    color: var(--akuko-dark);
+}
+
+/* Navbar customization */
+.navbar-brand {
+    font-weight: 700;
+    color: var(--akuko-primary) !important;
+}
+
+.navbar-brand i {
+    margin-right: 8px;
+}
+
+/* Card customization */
+.card {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.card-title {
+    color: var(--akuko-primary);
+    font-weight: 600;
+}
+
+/* Button customization */
+.btn-primary {
+    background-color: var(--akuko-primary);
+    border-color: var(--akuko-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--akuko-primary-dark);
+    border-color: var(--akuko-primary-dark);
+}
+
+/* Footer */
+.footer {
+    margin-top: 4rem;
+    padding: 2rem 0;
+    background-color: var(--akuko-dark);
+    color: white;
+}
+
+.footer a {
+    color: #adb5bd;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+/* Post content styling */
+.post-content {
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+.post-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.post-content h1,
+.post-content h2,
+.post-content h3 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: var(--akuko-primary);
+}
+
+/* Comment section */
+.comment {
+    border-left: 3px solid var(--akuko-primary);
+    padding-left: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.comment-author {
+    font-weight: 600;
+    color: var(--akuko-primary);
+}
+
+.comment-date {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+/* Admin specific */
+.admin-sidebar {
+    min-height: calc(100vh - 56px);
+    background-color: var(--akuko-dark);
+    padding: 0;
+}
+
+.admin-sidebar .nav-link {
+    color: #adb5bd;
+    padding: 0.75rem 1rem;
+    border-left: 3px solid transparent;
+}
+
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link.active {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left-color: var(--akuko-primary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2.5rem;
+    }
+    
+    .card {
+        margin-bottom: 1.5rem;
+    }
+}
