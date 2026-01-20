@@ -1,0 +1,330 @@
+# Akuko - Personal Blog Platform
+
+> A modern, feature-rich blogging platform built with Node.js, Express, and Dapbase
+
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![License](https://img.shields.io/badge/license-ISC-green.svg)
+![Node](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen.svg)
+
+## ✨ Features
+
+### 🎨 User Features
+- **Responsive Design** - Works beautifully on all devices
+- **Post Discovery** - Browse posts by category, search, or browse all
+- **Comments System** - Engage with readers (moderated)
+- **Social Sharing** - Share posts on Twitter, Facebook, LinkedIn
+- **Reading Time** - Automatically calculated
+- **Related Posts** - Discover more content
+- **Mobile-First** - Optimized for mobile viewing
+
+### 🛠️ Admin Features
+- **Dashboard** - Overview of posts, comments, and stats
+- **Rich Post Editor** - Markdown support with live preview
+- **Image Upload** - Drag-and-drop image uploads
+- **Category Management** - Organize content
+- **Comment Moderation** - Approve/delete comments
+- **Draft System** - Save and publish later
+- **Auto-Save** - Never lose your work
+- **SEO-Friendly** - Auto-generated slugs
+
+### 🔐 Security Features
+- **Secure Authentication** - bcrypt password hashing
+- **Session Management** - Express sessions
+- **CSRF Protection** - Built-in
+- **Input Validation** - Server-side validation
+- **XSS Prevention** - Helmet.js integration
+- **Role-Based Access** - Admin vs. User roles
+
+### 📊 Database Features (Powered by Dapbase)
+- **Auto-Timestamps** - createdAt/updatedAt managed automatically
+- **Foreign Keys** - Data integrity
+- **Schema Validation** - Type checking and constraints
+- **Query Operators** - Advanced filtering ($gt, $lt, $in, $like, etc.)
+- **Relationships** - JOIN support
+- **Cascade Delete** - Clean data removal
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 14+ and npm
+- Git
+
+### Installation
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/yourusername/akuko.git
+cd akuko
+```
+
+2. **Install dependencies**
+```bash
+npm install
+```
+
+3. **Create environment file**
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and set your values:
+```env
+PORT=3000
+NODE_ENV=development
+SESSION_SECRET=your-super-secret-key-here
+SITE_NAME=Akuko
+SITE_URL=http://localhost:3000
+```
+
+4. **Initialize database**
+```bash
+npm run setup
+```
+
+Follow the prompts to create your admin account.
+
+5. **Start the server**
+```bash
+# Development mode (with auto-restart)
+npm run dev
+
+# Production mode
+npm start
+```
+
+6. **Access the blog**
+- Homepage: http://localhost:3000
+- Admin Panel: http://localhost:3000/admin
+- Login: http://localhost:3000/auth/login
+
+## 📁 Project Structure
+
+```
+akuko/
+├── Dapbase/                    # Database files
+│   ├── dapbase.connection.js
+│   ├── dapbase.config.json
+│   └── akuko/                  # Your blog data
+│       ├── users.table
+│       ├── posts.table
+│       ├── comments.table
+│       ├── categories.table
+│       └── settings.table
+│
+├── middleware/                 # Custom middleware
+│   ├── auth.js                # Authentication
+│   └── upload.js              # File uploads
+│
+├── routes/                     # Route handlers
+│   ├── public.js              # Public routes
+│   ├── auth.js                # Auth routes
+│   └── admin.js               # Admin routes
+│
+├── views/                      # EJS templates
+│   ├── layout.ejs             # Main layout
+│   ├── public/                # Public pages
+│   ├── admin/                 # Admin pages
+│   ├── auth/                  # Auth pages
+│   └── errors/                # Error pages
+│
+├── public/                     # Static assets
+│   ├── css/style.css
+│   ├── js/main.js
+│   ├── js/image-uploader.js
+│   └── images/
+│
+├── uploads/                    # User uploads
+├── .env                        # Environment vars
+├── .gitignore
+├── app.js                      # Main app
+├── setup.js                    # Setup script
+├── package.json
+└── README.md
+```
+
+## 🎯 Usage Guide
+
+### Creating Your First Post
+
+1. Log in to admin panel (`/admin`)
+2. Click "New Post" or navigate to "Posts" → "New"
+3. Enter title, content, and optional details
+4. Upload a featured image (optional)
+5. Select a category and add tags
+6. Choose "Draft" or "Published"
+7. Click "Create"
+
+### Managing Categories
+
+1. Go to "Categories" in admin panel
+2. Enter name, description, and color
+3. Click "Add Category"
+4. Categories appear in sidebar and can be used for posts
+
+### Comment Moderation
+
+1. Navigate to "Comments" in admin
+2. View pending comments
+3. Click "Approve" or "Delete"
+4. Approved comments appear on posts
+
+### Customization
+
+#### Change Site Name
+Edit `.env`:
+```env
+SITE_NAME=Your Blog Name
+```
+
+#### Modify Styles
+Edit `public/css/style.css` to customize appearance.
+
+#### Add Custom Pages
+1. Log in as admin
+2. Navigate to database folder: `Dapbase/akuko/`
+3. Manually add to `pages.table` or create admin interface
+
+## 🔧 Configuration
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PORT` | Server port | 3000 |
+| `NODE_ENV` | Environment | development |
+| `SESSION_SECRET` | Session encryption key | Required |
+| `SITE_NAME` | Blog name | Akuko |
+| `SITE_URL` | Full site URL | http://localhost:3000 |
+| `MAX_FILE_SIZE` | Max upload size (bytes) | 5242880 (5MB) |
+
+### Database Configuration
+
+Edit `Dapbase/dapbase.config.json`:
+```json
+{
+  "project": "Akuko Blog",
+  "environment": "development",
+  "defaultDatabase": "akuko"
+}
+```
+
+## 📝 API Endpoints
+
+### Public Routes
+- `GET /` - Homepage
+- `GET /post/:slug` - Single post
+- `GET /category/:slug` - Category page
+- `GET /search?q=query` - Search
+- `POST /post/:slug/comment` - Submit comment
+
+### Auth Routes
+- `GET /auth/login` - Login page
+- `POST /auth/login` - Login submit
+- `GET /auth/register` - Register page
+- `POST /auth/register` - Register submit
+- `GET /auth/logout` - Logout
+
+### Admin Routes (Authenticated)
+- `GET /admin` - Dashboard
+- `GET /admin/posts` - List posts
+- `POST /admin/posts` - Create post
+- `GET /admin/posts/:id/edit` - Edit form
+- `POST /admin/posts/:id` - Update post
+- `DELETE /admin/posts/:id` - Delete post
+- `POST /admin/upload` - Upload image
+- `GET /admin/comments` - List comments
+- `POST /admin/comments/:id/approve` - Approve
+- `GET /admin/categories` - List categories
+- `GET /admin/profile` - User profile
+
+## 🛡️ Security Best Practices
+
+1. **Change SESSION_SECRET** - Use a strong, random string
+2. **Use HTTPS in production** - Enable SSL/TLS
+3. **Keep dependencies updated** - Run `npm audit`
+4. **Backup regularly** - Database is in `Dapbase/akuko/`
+5. **Limit file uploads** - Adjust MAX_FILE_SIZE
+6. **Use environment variables** - Never commit .env
+
+## 🚢 Deployment
+
+### Deploy to Heroku
+
+1. Create Heroku app
+```bash
+heroku create your-blog-name
+```
+
+2. Set environment variables
+```bash
+heroku config:set SESSION_SECRET=your-secret
+heroku config:set NODE_ENV=production
+```
+
+3. Deploy
+```bash
+git push heroku main
+```
+
+### Deploy to Railway
+
+1. Connect GitHub repo
+2. Set environment variables in dashboard
+3. Deploy automatically on push
+
+### Deploy to DigitalOcean
+
+1. Create a Droplet
+2. Install Node.js
+3. Clone repo and install dependencies
+4. Use PM2 for process management
+```bash
+npm install -g pm2
+pm2 start app.js --name akuko
+pm2 startup
+pm2 save
+```
+
+## 🤝 Contributing
+
+Contributions welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+ISC License - see LICENSE file
+
+## 🙏 Credits
+
+- Built with [Dapbase](https://github.com/Dubemernest23/dapbase)
+- Powered by Express.js
+- Styled with Tailwind CSS
+- Icons by [Heroicons](https://heroicons.com)
+
+## 📧 Support
+
+- Issues: [GitHub Issues](https://github.com/yourusername/akuko/issues)
+- Twitter: [@duby](https://x.com/dubemernest)
+
+## 🗺️ Roadmap
+
+- [ ] Rich text editor (TinyMCE/Quill)
+- [ ] Email notifications
+- [ ] RSS feed
+- [ ] Post scheduling
+- [ ] Multi-author support
+- [ ] Tags page
+- [ ] Archive page
+- [ ] Newsletter integration
+- [ ] Analytics dashboard
+- [ ] SEO optimization tools
+
+---
+
+**Made with ❤️ using Dapbase**

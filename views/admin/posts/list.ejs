@@ -1,0 +1,139 @@
+<div>
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold">Posts</h1>
+        <a href="/admin/posts/new" 
+           class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
+            + New Post
+        </a>
+    </div>
+    
+    <!-- Filter Tabs -->
+    <div class="bg-white rounded-lg shadow-md mb-6">
+        <div class="flex border-b">
+            <a href="/admin/posts?status=all" 
+               class="px-6 py-4 <%= currentStatus === 'all' ? 'border-b-2 border-blue-600 text-blue-600 font-medium' : 'text-gray-600 hover:text-gray-900' %>">
+                All Posts
+            </a>
+            <a href="/admin/posts?status=published" 
+               class="px-6 py-4 <%= currentStatus === 'published' ? 'border-b-2 border-blue-600 text-blue-600 font-medium' : 'text-gray-600 hover:text-gray-900' %>">
+                Published
+            </a>
+            <a href="/admin/posts?status=draft" 
+               class="px-6 py-4 <%= currentStatus === 'draft' ? 'border-b-2 border-blue-600 text-blue-600 font-medium' : 'text-gray-600 hover:text-gray-900' %>">
+                Drafts
+            </a>
+        </div>
+    </div>
+    
+    <!-- Posts Table -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <% if (posts.length === 0) { %>
+            <div class="p-12 text-center">
+                <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <p class="text-gray-500 text-lg mb-4">No posts found</p>
+                <a href="/admin/posts/new" 
+                   class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    Create Your First Post
+                </a>
+            </div>
+        <% } else { %>
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Title
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Author
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Category
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Views
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Date
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <% posts.forEach(post => { %>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center">
+                                    <div>
+                                        <div class="font-medium text-gray-900">
+                                            <a href="/post/<%= post.slug %>" 
+                                               target="_blank"
+                                               class="hover:text-blue-600">
+                                                <%= post.title %>
+                                            </a>
+                                        </div>
+                                        <div class="text-sm text-gray-500">
+                                            /<%= post.slug %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
+                                    <%= post.author ? post.author.displayName : 'Unknown' %>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <% if (post.category) { %>
+                                    <span class="px-2 py-1 text-xs rounded"
+                                          style="background-color: <%= post.category.color %>20; color: <%= post.category.color %>">
+                                        <%= post.category.name %>
+                                    </span>
+                                <% } else { %>
+                                    <span class="text-gray-400 text-sm">None</span>
+                                <% } %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs font-medium rounded
+                                    <%= post.status === 'published' ? 'bg-green-100 text-green-800' : 
+                                       post.status === 'draft' ? 'bg-yellow-100 text-yellow-800' : 
+                                       'bg-gray-100 text-gray-800' %>">
+                                    <%= post.status %>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <%= post.views %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <%= formatDate(post.createdAt) %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-2">
+                                    <a href="/admin/posts/<%= post.id %>/edit" 
+                                       class="text-blue-600 hover:text-blue-900">
+                                        Edit
+                                    </a>
+                                    <form action="/admin/posts/<%= post.id %>?_method=DELETE" 
+                                          method="POST" 
+                                          onsubmit="return confirm('Are you sure you want to delete this post?')"
+                                          class="inline">
+                                        <button type="submit" 
+                                                class="text-red-600 hover:text-red-900">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } %>
+    </div>
+</div>

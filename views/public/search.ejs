@@ -1,0 +1,118 @@
+<div class="max-w-4xl mx-auto">
+    <!-- Search Header -->
+    <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+        <h1 class="text-4xl font-bold mb-6">Search Posts</h1>
+        
+        <!-- Search Form -->
+        <form action="/search" method="GET" class="flex gap-4">
+            <input type="text" 
+                   name="q" 
+                   value="<%= query %>"
+                   placeholder="Search for posts, tags, or content..." 
+                   class="flex-1 px-6 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-lg"
+                   autofocus>
+            <button type="submit" 
+                    class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
+                Search
+            </button>
+        </form>
+        
+        <% if (query) { %>
+            <p class="text-gray-600 mt-4">
+                <% if (posts.length > 0) { %>
+                    Found <strong><%= posts.length %></strong> result<%= posts.length !== 1 ? 's' : '' %> for "<%= query %>"
+                <% } else { %>
+                    No results found for "<%= query %>"
+                <% } %>
+            </p>
+        <% } %>
+    </div>
+    
+    <!-- Search Results -->
+    <% if (query) { %>
+        <% if (posts.length === 0) { %>
+            <div class="bg-white rounded-lg shadow-md p-12 text-center">
+                <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <h2 class="text-2xl font-bold text-gray-700 mb-2">No Results Found</h2>
+                <p class="text-gray-500 mb-6">
+                    Try different keywords or browse all posts
+                </p>
+                <a href="/" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 inline-block">
+                    Browse All Posts
+                </a>
+            </div>
+        <% } else { %>
+            <div class="space-y-6">
+                <% posts.forEach(post => { %>
+                    <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                        <div class="p-6">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <h2 class="text-2xl font-bold mb-2">
+                                        <a href="/post/<%= post.slug %>" class="hover:text-blue-600">
+                                            <%= post.title %>
+                                        </a>
+                                    </h2>
+                                    
+                                    <div class="text-sm text-gray-500 mb-3 flex items-center space-x-3">
+                                        <% if (post.author) { %>
+                                            <span>By <%= post.author.displayName %></span>
+                                            <span>•</span>
+                                        <% } %>
+                                        <span><%= formatDate(post.publishedAt) %></span>
+                                        <% if (post.category) { %>
+                                            <span>•</span>
+                                            <a href="/category/<%= post.category.slug %>" 
+                                               class="text-blue-600 hover:underline">
+                                                <%= post.category.name %>
+                                            </a>
+                                        <% } %>
+                                    </div>
+                                    
+                                    <p class="text-gray-700 mb-4">
+                                        <%= post.excerpt || truncate(post.content, 200) %>
+                                    </p>
+                                    
+                                    <!-- Tags -->
+                                    <% if (post.tags && post.tags.length > 0) { %>
+                                        <div class="flex flex-wrap gap-2 mb-4">
+                                            <% post.tags.forEach(tag => { %>
+                                                <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                                                    #<%= tag %>
+                                                </span>
+                                            <% }) %>
+                                        </div>
+                                    <% } %>
+                                    
+                                    <a href="/post/<%= post.slug %>" 
+                                       class="text-blue-600 hover:underline font-medium">
+                                        Read full post →
+                                    </a>
+                                </div>
+                                
+                                <% if (post.featuredImage) { %>
+                                    <img src="<%= post.featuredImage %>" 
+                                         alt="<%= post.title %>" 
+                                         class="w-32 h-32 object-cover rounded-lg ml-6">
+                                <% } %>
+                            </div>
+                        </div>
+                    </article>
+                <% }) %>
+            </div>
+        <% } %>
+    <% } else { %>
+        <!-- Empty State -->
+        <div class="bg-white rounded-lg shadow-md p-12 text-center">
+            <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <h2 class="text-2xl font-bold text-gray-700 mb-2">Search for Posts</h2>
+            <p class="text-gray-500">
+                Enter keywords to find posts, tags, or topics
+            </p>
+        </div>
+    <% } %>
+</div>
