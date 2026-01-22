@@ -35,8 +35,8 @@ function isAuthenticated(req, res, next) {
     };
   }
   
-  module.exports = {
+module.exports = {
     isAuthenticated,
     isAdmin,
     isOwnerOrAdmin
-  };
+};

@@ -1,0 +1,61 @@
+{
+  "name": "settings",
+  "createdAt": "2026-01-20T23:24:13.154Z",
+  "columns": {
+    "key": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "value": {
+      "type": "text",
+      "required": true
+    },
+    "type": {
+      "type": "string",
+      "default": "string"
+    },
+    "id": {
+      "type": "uuid",
+      "required": true
+    }
+  },
+  "relationships": {},
+  "rows": [
+    {
+      "key": "site_title",
+      "value": "Akuko",
+      "type": "string",
+      "id": "c4c18f6a-f887-4e15-a266-2751e943cacb"
+    },
+    {
+      "key": "site_description",
+      "value": "Personal thoughts and stories",
+      "type": "string",
+      "id": "494c7187-8eed-4544-bba7-82402f274d38"
+    },
+    {
+      "key": "posts_per_page",
+      "value": "10",
+      "type": "number",
+      "id": "6cfa47e6-4908-4295-9285-b716b216f290"
+    },
+    {
+      "key": "allow_comments",
+      "value": "true",
+      "type": "boolean",
+      "id": "0faa0e4d-bae6-4aa3-944a-860a2b99bb4f"
+    },
+    {
+      "key": "comment_moderation",
+      "value": "true",
+      "type": "boolean",
+      "id": "d97433fe-4531-4731-8c87-e5746becd07b"
+    }
+  ],
+  "indexes": {},
+  "options": {
+    "encryption": {},
+    "timestamps": false
+  }
+}

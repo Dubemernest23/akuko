@@ -1,0 +1,15 @@
+{
+  "username": "duby",
+  "project": "akuko",
+  "createdAt": "2026-01-20T23:15:55.870Z",
+  "version": "3.0.1",
+  "description": "Dapbase configuration",
+  "environment": "development",
+  "defaultDatabase": "akuko",
+  "logLevel": "info",
+  "autoBackup": true,
+  "backupInterval": "weekly",
+  "backupPath": "./backups",
+  "maxFileSizeMB": 10,
+  "encryptionEnabled": true
+}

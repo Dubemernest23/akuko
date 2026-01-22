@@ -5,6 +5,7 @@ const slugify = require('slugify');
 const { body, validationResult } = require('express-validator');
 const db = require('../Dapbase/dapbase.connection.js');
 const { isAuthenticated, isAdmin } = require('../middleware/auth');
+const { upload, deleteFile } = require('../middleware/upload');
 
 // Apply authentication to all admin routes
 router.use(isAuthenticated);
@@ -422,6 +423,37 @@ router.post('/profile', async (req, res, next) => {
     res.redirect('/admin/profile');
   } catch (error) {
     next(error);
+  }
+});
+
+// ==================== FILE UPLOAD ====================
+
+// Upload image endpoint
+router.post('/upload', upload.single('image'), async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const imageUrl = `/uploads/${req.file.filename}`;
+    
+    res.json({
+      success: true,
+      url: imageUrl,
+      filename: req.file.filename
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete uploaded image
+router.delete('/upload/:filename', async (req, res, next) => {
+  try {
+    deleteFile(req.params.filename);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

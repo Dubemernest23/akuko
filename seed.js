@@ -1,5 +1,5 @@
 // scripts/seed.js - Seed database with sample data
-const db = require('../Dapbase/dapbase.connection.js');
+const db = require('./Dapbase/dapbase.connection');
 const bcrypt = require('bcryptjs');
 
 async function seed() {

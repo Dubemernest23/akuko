@@ -1,53 +1,68 @@
-akuko-blog/
-├── 📁 config/                 # Configuration files
-│   └── database.js           # Dapbase setup and schema
-├── 📁 middleware/            # Custom middleware
-│   ├── auth.js              # Authentication middleware
-│   └── validation.js        # Input validation
-├── 📁 models/               # Data models (if needed)
-│   └── Post.js              # Post model with helper methods
-├── 📁 routes/               # Express routes
-│   ├── admin.js            # Admin routes (protected)
-│   ├── posts.js            # Public post routes
-│   ├── comments.js         # Comment routes
-│   └── index.js            # Main route aggregator
-├── 📁 public/               # Static assets
-│   ├── css/                # Custom CSS (overrides)
-│   │   └── custom.css
-│   ├── js/                 # Frontend JavaScript
-│   │   └── main.js
-│   ├── images/             # Uploaded images
-│   └── uploads/            # File uploads
-├── 📁 views/               # EJS templates
-│   ├── 📁 layouts/         # Layout templates
-│   │   └── main.ejs        # Main layout
-│   ├── 📁 partials/        # Reusable components
+akuko/
+├── Dapbase/                    # Database folder (auto-generated)
+│   ├── dapbase.connection.js   # Import this in your code
+│   ├── dapbase.config.json     # Configuration
+│   └── akuko/                  # Your blog database
+│       ├── users.table
+│       ├── posts.table
+│       ├── comments.table
+│       ├── categories.table
+│       ├── pages.table
+│       └── settings.table
+│
+├── middleware/
+│   └── auth.js                 # Authentication middleware
+│
+├── routes/
+│   ├── public.js               # Public-facing routes
+│   ├── auth.js                 # Login, register, logout
+│   └── admin.js                # Admin panel routes
+│
+├── views/
+│   ├── layout.ejs              # Main layout
+│   ├── partials/               # Reusable components
 │   │   ├── header.ejs
 │   │   ├── footer.ejs
-│   │   ├── navbar.ejs
-│   │   └── flash.ejs       # Flash messages
-│   ├── 📁 admin/           # Admin templates
+│   │   ├── sidebar.ejs
+│   │   └── flash.ejs
+│   ├── public/                 # Public pages
+│   │   ├── home.ejs
+│   │   ├── post.ejs
+│   │   ├── category.ejs
+│   │   ├── search.ejs
+│   │   └── page.ejs
+│   ├── admin/                  # Admin pages
 │   │   ├── dashboard.ejs
-│   │   ├── login.ejs
+│   │   ├── profile.ejs
 │   │   ├── posts/
 │   │   │   ├── list.ejs
-│   │   │   ├── create.ejs
-│   │   │   └── edit.ejs
-│   │   └── comments/
+│   │   │   └── form.ejs
+│   │   ├── comments/
+│   │   │   └── list.ejs
+│   │   └── categories/
 │   │       └── list.ejs
-│   ├── home.ejs            # Homepage
-│   ├── post.ejs            # Single post view
-│   └── error.ejs           # Error page
-├── 📁 utils/               # Utility functions
-│   ├── helpers.js          # EJS helper functions
-│   ├── slugify.js          # Slug generation
-│   └── sanitize.js         # HTML sanitization
-├── 📁 seeds/               # Seed data (optional)
-│   └── initial-data.js
-├── .env                    # Environment variables
-├── .env.example            # Example env file
+│   ├── auth/                   # Auth pages
+│   │   ├── login.ejs
+│   │   ├── register.ejs
+│   │   └── change-password.ejs
+│   └── errors/
+│       ├── 404.ejs
+│       └── 500.ejs
+│
+├── public/                     # Static files
+│   ├── css/
+│   │   └── style.css
+│   ├── js/
+│   │   └── main.js
+│   └── images/
+│       └── default-avatar.png
+│
+├── uploads/                    # User uploads (create this folder)
+│
+├── .env                        # Environment variables
+├── .env.example                # Example env file
 ├── .gitignore
+├── app.js                      # Main application
+├── setup.js                    # Database setup script
 ├── package.json
-├── server.js              # Main Express app
-├── setup.js               # Database setup script
 └── README.md

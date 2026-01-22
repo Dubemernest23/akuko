@@ -1,4 +1,5 @@
 // setup.js - Initialize blog database and create admin user
+
 const db = require('./Dapbase/dapbase.connection.js');
 const bcrypt = require('bcryptjs');
 const readline = require('readline');

@@ -1,0 +1,69 @@
+{
+  "name": "comments",
+  "createdAt": "2026-01-20T23:24:13.140Z",
+  "columns": {
+    "content": {
+      "type": "text",
+      "required": true,
+      "minLength": 1
+    },
+    "authorName": {
+      "type": "string",
+      "required": true
+    },
+    "authorEmail": {
+      "type": "string",
+      "required": true
+    },
+    "postId": {
+      "type": "uuid",
+      "required": true
+    },
+    "userId": {
+      "type": "uuid"
+    },
+    "parentId": {
+      "type": "uuid"
+    },
+    "isApproved": {
+      "type": "boolean",
+      "default": false
+    },
+    "ipAddress": {
+      "type": "string",
+      "default": ""
+    },
+    "id": {
+      "type": "uuid",
+      "required": true
+    },
+    "createdAt": {
+      "type": "string",
+      "default": "NOW"
+    },
+    "updatedAt": {
+      "type": "string",
+      "default": "NOW"
+    }
+  },
+  "relationships": {
+    "postId": {
+      "foreignTable": "posts",
+      "foreignKey": "id"
+    },
+    "userId": {
+      "foreignTable": "users",
+      "foreignKey": "id"
+    },
+    "parentId": {
+      "foreignTable": "comments",
+      "foreignKey": "id"
+    }
+  },
+  "rows": [],
+  "indexes": {},
+  "options": {
+    "encryption": {},
+    "timestamps": true
+  }
+}

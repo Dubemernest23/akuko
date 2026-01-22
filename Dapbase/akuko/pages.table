@@ -1,0 +1,46 @@
+{
+  "name": "pages",
+  "createdAt": "2026-01-20T23:24:13.147Z",
+  "columns": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "content": {
+      "type": "text",
+      "required": true
+    },
+    "isPublished": {
+      "type": "boolean",
+      "default": true
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    },
+    "id": {
+      "type": "uuid",
+      "required": true
+    },
+    "createdAt": {
+      "type": "string",
+      "default": "NOW"
+    },
+    "updatedAt": {
+      "type": "string",
+      "default": "NOW"
+    }
+  },
+  "relationships": {},
+  "rows": [],
+  "indexes": {},
+  "options": {
+    "encryption": {},
+    "timestamps": true
+  }
+}

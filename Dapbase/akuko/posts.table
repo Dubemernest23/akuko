@@ -1,0 +1,92 @@
+{
+  "name": "posts",
+  "createdAt": "2026-01-20T23:24:13.129Z",
+  "columns": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 200
+    },
+    "slug": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "content": {
+      "type": "text",
+      "required": true
+    },
+    "excerpt": {
+      "type": "text",
+      "default": ""
+    },
+    "featuredImage": {
+      "type": "string",
+      "default": ""
+    },
+    "status": {
+      "type": "string",
+      "default": "draft"
+    },
+    "views": {
+      "type": "integer",
+      "default": 0,
+      "min": 0
+    },
+    "authorId": {
+      "type": "uuid",
+      "required": true
+    },
+    "categoryId": {
+      "type": "uuid"
+    },
+    "tags": {
+      "type": "json",
+      "default": []
+    },
+    "publishedAt": {
+      "type": "string"
+    },
+    "id": {
+      "type": "uuid",
+      "required": true
+    },
+    "createdAt": {
+      "type": "string",
+      "default": "NOW"
+    },
+    "updatedAt": {
+      "type": "string",
+      "default": "NOW"
+    }
+  },
+  "relationships": {
+    "authorId": {
+      "foreignTable": "users",
+      "foreignKey": "id"
+    },
+    "categoryId": {
+      "foreignTable": "categories",
+      "foreignKey": "id"
+    }
+  },
+  "rows": [],
+  "indexes": {
+    "slug": {
+      "type": "hash",
+      "unique": true,
+      "createdAt": "2026-01-20T23:24:13.162Z",
+      "data": {}
+    },
+    "status": {
+      "type": "hash",
+      "unique": false,
+      "createdAt": "2026-01-20T23:24:13.169Z",
+      "data": {}
+    }
+  },
+  "options": {
+    "encryption": {},
+    "timestamps": true
+  }
+}

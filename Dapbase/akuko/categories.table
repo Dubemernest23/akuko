@@ -1,0 +1,80 @@
+{
+  "name": "categories",
+  "createdAt": "2026-01-20T23:24:13.118Z",
+  "columns": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "slug": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "description": {
+      "type": "text",
+      "default": ""
+    },
+    "color": {
+      "type": "string",
+      "default": "#3B82F6"
+    },
+    "id": {
+      "type": "uuid",
+      "required": true
+    },
+    "createdAt": {
+      "type": "string",
+      "default": "NOW"
+    },
+    "updatedAt": {
+      "type": "string",
+      "default": "NOW"
+    }
+  },
+  "relationships": {},
+  "rows": [
+    {
+      "name": "Technology",
+      "slug": "technology",
+      "description": "Tech articles and tutorials",
+      "color": "#3B82F6",
+      "id": "61f32eb1-41ad-4a80-8126-048a02573451",
+      "createdAt": "2026-01-20T23:24:13.196Z",
+      "updatedAt": "2026-01-20T23:24:13.196Z"
+    },
+    {
+      "name": "Life",
+      "slug": "life",
+      "description": "Personal thoughts and experiences",
+      "color": "#10B981",
+      "id": "668bdfc8-aa6f-4a66-9893-91fec8a65886",
+      "createdAt": "2026-01-20T23:24:13.203Z",
+      "updatedAt": "2026-01-20T23:24:13.203Z"
+    },
+    {
+      "name": "Stories",
+      "slug": "stories",
+      "description": "Narratives and tales",
+      "color": "#F59E0B",
+      "id": "6a86bb4b-2ea5-4a91-bfcd-ac1774922b60",
+      "createdAt": "2026-01-20T23:24:13.210Z",
+      "updatedAt": "2026-01-20T23:24:13.210Z"
+    },
+    {
+      "name": "Thoughts",
+      "slug": "thoughts",
+      "description": "Random musings",
+      "color": "#8B5CF6",
+      "id": "8637770e-8cb3-493e-9954-cd6ac2c264f0",
+      "createdAt": "2026-01-20T23:24:13.216Z",
+      "updatedAt": "2026-01-20T23:24:13.216Z"
+    }
+  ],
+  "indexes": {},
+  "options": {
+    "encryption": {},
+    "timestamps": true
+  }
+}

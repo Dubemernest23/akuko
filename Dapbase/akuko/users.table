@@ -1,0 +1,83 @@
+{
+  "name": "users",
+  "createdAt": "2026-01-20T23:24:13.094Z",
+  "columns": {
+    "username": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "minLength": 3
+    },
+    "email": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "pattern": "^[^@]+@[^@]+\\.[^@]+$"
+    },
+    "passwordHash": {
+      "type": "string",
+      "required": true
+    },
+    "displayName": {
+      "type": "string",
+      "required": true
+    },
+    "role": {
+      "type": "string",
+      "default": "user"
+    },
+    "avatar": {
+      "type": "string",
+      "default": "/images/default-avatar.png"
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true
+    },
+    "id": {
+      "type": "uuid",
+      "required": true
+    },
+    "createdAt": {
+      "type": "string",
+      "default": "NOW"
+    },
+    "updatedAt": {
+      "type": "string",
+      "default": "NOW"
+    }
+  },
+  "relationships": {},
+  "rows": [
+    {
+      "username": "duby",
+      "email": "dubyernest14@gmail.com",
+      "displayName": "23fx",
+      "passwordHash": "$2b$10$ENk6PYEdJGXPCjCwhr3fOu/V9qYbVBOECf/Z7p6aavzApKAetixfu",
+      "role": "user",
+      "isActive": true,
+      "id": "536c9e61-be01-4a03-9e0a-42b49c9c9066",
+      "avatar": "/images/default-avatar.png",
+      "createdAt": "2026-01-20T23:54:02.342Z",
+      "updatedAt": "2026-01-20T23:54:02.343Z"
+    }
+  ],
+  "indexes": {
+    "email": {
+      "type": "hash",
+      "unique": true,
+      "createdAt": "2026-01-20T23:24:13.176Z",
+      "data": {}
+    },
+    "username": {
+      "type": "hash",
+      "unique": true,
+      "createdAt": "2026-01-20T23:24:13.183Z",
+      "data": {}
+    }
+  },
+  "options": {
+    "encryption": {},
+    "timestamps": true
+  }
+}
