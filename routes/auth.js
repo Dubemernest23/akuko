@@ -29,6 +29,9 @@ router.post('/login', [
   body('username').trim().notEmpty().withMessage('Username is required'),
   body('password').notEmpty().withMessage('Password is required')
 ], async (req, res, next) => {
+  console.log('POST /auth/login reached');
+  console.log('Session before:', req.session);           // ← very important
+  console.log('Body:', req.body);
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -50,7 +53,7 @@ router.post('/login', [
     }
 
     const user = users[0];
-
+    console.log('Found users:', users);
     // Check if user is active
     if (!user.isActive) {
       req.flash('error', 'Your account has been deactivated');
@@ -74,8 +77,25 @@ router.post('/login', [
       avatar: user.avatar
     };
 
-    req.flash('success', `Welcome back, ${user.displayName}!`);
-    res.redirect('/admin');
+    // req.flash('success', `Welcome back, ${user.displayName}!`);
+    // res.redirect('/admin/');
+  
+  
+    console.log('Session after setting user:', req.session);  // ← crucial
+    console.log('About to save session...');
+
+    // Force save (sometimes needed in some session stores)
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        return next(err);
+      }
+      console.log('Session saved successfully');
+      req.flash('success', `Welcome back, ${user.displayName || user.username}!`);
+      res.redirect('/admin/');
+    });
+  
+  
   } catch (error) {
     next(error);
   }
@@ -157,7 +177,7 @@ router.post('/register', [
     };
 
     req.flash('success', 'Account created successfully!');
-    res.redirect('/admin');
+    res.redirect('/admin/dashboard');
   } catch (error) {
     next(error);
   }

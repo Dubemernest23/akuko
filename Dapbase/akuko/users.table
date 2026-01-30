@@ -69,14 +69,14 @@
       "username": "admin",
       "email": "admin@akuko.local",
       "displayName": "Administrator",
-      "passwordHash": "$2b$10$fyXZSfNwEb02SpAZDK5BkudtIyxrXnm.OfGqorYovoFHZco7NZod2",
+      "passwordHash": "$2b$10$.QRR3nY/WY6dBx5WETwU0ulG3z2ib5jwRBKtcgpn6EO9S3ydNmf5.",
       "role": "admin",
       "isActive": true,
       "avatar": "/images/default-avatar.png",
       "bio": "something short",
       "id": "d04d9b4f-cedd-4123-987f-19ce5eac20ed",
       "createdAt": "2026-01-22T17:22:00.629Z",
-      "updatedAt": "2026-01-22T17:22:00.653Z"
+      "updatedAt": "2026-01-30T16:34:50.005Z"
     },
     {
       "username": "johndoe",

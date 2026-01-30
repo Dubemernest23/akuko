@@ -447,7 +447,7 @@ router.get('/profile', async (req, res, next) => {
 
     if (users.length === 0) return res.redirect('/auth/logout');
 
-    res.render('admin/profile', { title: 'Profile', user: users[0] });
+    res.render('admin/profile/profile', { title: 'Profile', user: users[0] });
   } catch (error) {
     console.error('Profile load error:', error);
     next(error);
