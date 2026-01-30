@@ -4,14 +4,14 @@
 document.addEventListener('DOMContentLoaded', function() {
   
     // Mobile menu
-    // const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-    // const mobileMenu = document.getElementById('mobile-menu');
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
     
-    // if (mobileMenuBtn && mobileMenu) {
-    //   mobileMenuBtn.addEventListener('click', function() {
-    //     mobileMenu.classList.toggle('hidden');
-    //   });
-    // }
+    if (mobileMenuBtn && mobileMenu) {
+      mobileMenuBtn.addEventListener('click', function() {
+        mobileMenu.classList.toggle('hidden');
+      });
+    }
     
     // Auto-hide flash messages
     const flashMessages = document.querySelectorAll('.bg-green-100, .bg-red-100, .bg-yellow-100');
