@@ -20,9 +20,9 @@ const adminRoutes = require('./routes/admin');
 const authRoutes = require('./routes/auth');
 
 // Security middleware
-app.use(helmet({
-  contentSecurityPolicy: false // Adjust as needed
-}));
+// app.use(helmet({
+//   contentSecurityPolicy: false // Adjust as needed
+// }));
 app.use(cors());
 
 // Logging

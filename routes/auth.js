@@ -17,6 +17,7 @@ router.use(async (req, res, next) => {
 
 // Login page
 router.get('/login', (req, res) => {
+  
   if (req.session.user) {
     return res.redirect('/admin');
   }
@@ -36,7 +37,7 @@ router.post('/login', [
     }
 
     const { username, password } = req.body;
-
+    // console.log(username, password)
     // Find user
     const users = await db.select('users', {
       where: { username },

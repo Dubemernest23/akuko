@@ -23,7 +23,6 @@ router.use(async (req, res, next) => {
 // Dashboard
 router.get('/', async (req, res, next) => {
   try {
-    // Get statistics
     const allPosts = await db.select('posts', { silent: true });
     const publishedPosts = allPosts.filter(p => p.status === 'published');
     const draftPosts = allPosts.filter(p => p.status === 'draft');
@@ -33,7 +32,6 @@ router.get('/', async (req, res, next) => {
     
     const categories = await db.select('categories', { silent: true });
 
-    // Get recent posts
     const recentPosts = await db.select('posts', {
       join: [{
         table: 'users',
@@ -46,7 +44,6 @@ router.get('/', async (req, res, next) => {
       silent: true
     });
 
-    // Get recent comments
     const recentComments = await db.select('comments', {
       join: [{
         table: 'posts',
@@ -73,11 +70,10 @@ router.get('/', async (req, res, next) => {
       recentComments
     });
   } catch (error) {
+    console.error('Dashboard error:', error);
     next(error);
   }
 });
-
-// ==================== POSTS ====================
 
 // List all posts
 router.get('/posts', async (req, res, next) => {
@@ -106,12 +102,25 @@ router.get('/posts', async (req, res, next) => {
       silent: true
     });
 
+    // Optional: normalize tags for display if needed in list view
+    posts.forEach(post => {
+      if (typeof post.tags === 'string') {
+        try {
+          post.tags = JSON.parse(post.tags);
+        } catch {
+          post.tags = [];
+        }
+      }
+      if (!Array.isArray(post.tags)) post.tags = [];
+    });
+
     res.render('admin/posts/list', {
       title: 'Posts',
       posts,
       currentStatus: status
     });
   } catch (error) {
+    console.error('Posts list error:', error);
     next(error);
   }
 });
@@ -127,6 +136,7 @@ router.get('/posts/new', async (req, res, next) => {
       categories
     });
   } catch (error) {
+    console.error('New post form error:', error);
     next(error);
   }
 });
@@ -143,36 +153,49 @@ router.post('/posts', [
       return res.redirect('/admin/posts/new');
     }
 
-    const { title, content, excerpt, categoryId, tags, status } = req.body;
+    const { title, content, excerpt, categoryId, tags, status, featuredImage } = req.body;
 
-    // Generate slug
+    // Generate unique slug
     let slug = slugify(title, { lower: true, strict: true });
-    
-    // Ensure unique slug
-    const existingSlugs = await db.select('posts', {
-      where: { slug },
-      silent: true
-    });
-    
+    const existingSlugs = await db.select('posts', { where: { slug }, silent: true });
     if (existingSlugs.length > 0) {
       slug = `${slug}-${Date.now()}`;
     }
 
-    // Parse tags
-    const tagsArray = tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+    // Parse tags → always convert to array → then stringify for DB
+    let tagsArray = [];
+    if (tags) {
+      if (typeof tags === 'string') {
+        tagsArray = tags.split(',').map(t => t.trim()).filter(Boolean);
+      } else if (Array.isArray(tags)) {
+        tagsArray = tags.map(t => (typeof t === 'string' ? t.trim() : '')).filter(Boolean);
+      }
+    }
+    const tagsJson = JSON.stringify(tagsArray);
+
+    // Handle featured image (sometimes sent as array from form)
+    let imageUrl = '';
+    if (featuredImage) {
+      if (Array.isArray(featuredImage)) {
+        imageUrl = featuredImage.find(img => img && typeof img === 'string' && img.trim()) || '';
+      } else if (typeof featuredImage === 'string' && featuredImage.trim()) {
+        imageUrl = featuredImage.trim();
+      }
+    }
 
     const postData = {
       title,
       slug,
       content,
-      excerpt: excerpt || content.substring(0, 150),
+      excerpt: excerpt || (content ? content.substring(0, 150) : ''),
+      featuredImage: imageUrl,
       categoryId: categoryId || null,
-      tags: tagsArray,
+      tags: tagsJson,               // ← JSON string
       status: status || 'draft',
       authorId: req.session.user.id
     };
 
-    if (status === 'published' && !postData.publishedAt) {
+    if (status === 'published') {
       postData.publishedAt = new Date().toISOString();
     }
 
@@ -181,7 +204,9 @@ router.post('/posts', [
     req.flash('success', 'Post created successfully!');
     res.redirect('/admin/posts');
   } catch (error) {
-    next(error);
+    console.error('Create post error:', error.message, error.stack);
+    req.flash('error', 'Failed to create post. Please try again.');
+    res.redirect('/admin/posts/new');
   }
 });
 
@@ -198,14 +223,34 @@ router.get('/posts/:id/edit', async (req, res, next) => {
       return res.redirect('/admin/posts');
     }
 
+    const post = posts[0];
+
+    // Normalize tags to array for the form (EJS will join it)
+    let tagsArray = [];
+    if (post.tags) {
+      if (typeof post.tags === 'string') {
+        try {
+          tagsArray = JSON.parse(post.tags);
+        } catch (e) {
+          console.error('Failed to parse tags in edit form:', e);
+        }
+      } else if (Array.isArray(post.tags)) {
+        tagsArray = post.tags;
+      }
+    }
+
+    // Ensure it's always an array
+    post.tags = Array.isArray(tagsArray) ? tagsArray : [];
+
     const categories = await db.select('categories', { silent: true });
 
     res.render('admin/posts/form', {
       title: 'Edit Post',
-      post: posts[0],
+      post,
       categories
     });
   } catch (error) {
+    console.error('Edit post form error:', error);
     next(error);
   }
 });
@@ -213,7 +258,7 @@ router.get('/posts/:id/edit', async (req, res, next) => {
 // Update post
 router.post('/posts/:id', async (req, res, next) => {
   try {
-    const { title, content, excerpt, categoryId, tags, status } = req.body;
+    const { title, content, excerpt, categoryId, tags, status, featuredImage } = req.body;
 
     const posts = await db.select('posts', {
       where: { id: req.params.id },
@@ -227,19 +272,37 @@ router.post('/posts/:id', async (req, res, next) => {
 
     const post = posts[0];
 
-    // Parse tags
-    const tagsArray = tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+    // Tags: string → array → JSON
+    let tagsArray = [];
+    if (tags) {
+      if (typeof tags === 'string') {
+        tagsArray = tags.split(',').map(t => t.trim()).filter(Boolean);
+      } else if (Array.isArray(tags)) {
+        tagsArray = tags.map(t => (typeof t === 'string' ? t.trim() : '')).filter(Boolean);
+      }
+    }
+    const tagsJson = JSON.stringify(tagsArray);
+
+    // Featured image
+    let imageUrl = post.featuredImage || '';
+    if (featuredImage) {
+      if (Array.isArray(featuredImage)) {
+        imageUrl = featuredImage.find(img => img && typeof img === 'string' && img.trim()) || imageUrl;
+      } else if (typeof featuredImage === 'string' && featuredImage.trim()) {
+        imageUrl = featuredImage.trim();
+      }
+    }
 
     const updateData = {
       title,
       content,
-      excerpt: excerpt || content.substring(0, 150),
+      excerpt: excerpt || (content ? content.substring(0, 150) : ''),
+      featuredImage: imageUrl,
       categoryId: categoryId || null,
-      tags: tagsArray,
+      tags: tagsJson,                    // ← JSON string
       status: status || post.status
     };
 
-    // Set publishedAt if publishing for first time
     if (status === 'published' && post.status !== 'published') {
       updateData.publishedAt = new Date().toISOString();
     }
@@ -249,7 +312,9 @@ router.post('/posts/:id', async (req, res, next) => {
     req.flash('success', 'Post updated successfully!');
     res.redirect('/admin/posts');
   } catch (error) {
-    next(error);
+    console.error('Update post error:', error.message, error.stack);
+    req.flash('error', 'Failed to update post.');
+    res.redirect(`/admin/posts/${req.params.id}/edit`);
   }
 });
 
@@ -257,27 +322,24 @@ router.post('/posts/:id', async (req, res, next) => {
 router.delete('/posts/:id', async (req, res, next) => {
   try {
     await db.delete('posts', { id: req.params.id }, { cascade: true, silent: true });
-    
     req.flash('success', 'Post deleted successfully!');
     res.redirect('/admin/posts');
   } catch (error) {
+    console.error('Delete post error:', error);
     next(error);
   }
 });
 
-// ==================== COMMENTS ====================
+// ────────────────────────────────────────────────
+// COMMENTS ────────────────────────────────────────
+// ────────────────────────────────────────────────
 
-// List comments
 router.get('/comments', async (req, res, next) => {
   try {
     const status = req.query.status || 'all';
-    
     let where = {};
-    if (status === 'pending') {
-      where.isApproved = false;
-    } else if (status === 'approved') {
-      where.isApproved = true;
-    }
+    if (status === 'pending') where.isApproved = false;
+    if (status === 'approved') where.isApproved = true;
 
     const comments = await db.select('comments', {
       where,
@@ -297,62 +359,53 @@ router.get('/comments', async (req, res, next) => {
       currentStatus: status
     });
   } catch (error) {
+    console.error('Comments list error:', error);
     next(error);
   }
 });
 
-// Approve comment
 router.post('/comments/:id/approve', async (req, res, next) => {
   try {
-    await db.update('comments',
-      { isApproved: true },
-      { id: req.params.id },
-      { silent: true }
-    );
-
+    await db.update('comments', { isApproved: true }, { id: req.params.id }, { silent: true });
     req.flash('success', 'Comment approved!');
     res.redirect('/admin/comments');
   } catch (error) {
+    console.error('Approve comment error:', error);
     next(error);
   }
 });
 
-// Delete comment
 router.delete('/comments/:id', async (req, res, next) => {
   try {
     await db.delete('comments', { id: req.params.id }, { silent: true });
-    
     req.flash('success', 'Comment deleted!');
     res.redirect('/admin/comments');
   } catch (error) {
+    console.error('Delete comment error:', error);
     next(error);
   }
 });
 
-// ==================== CATEGORIES ====================
+// ────────────────────────────────────────────────
+// CATEGORIES ──────────────────────────────────────
+// ────────────────────────────────────────────────
 
-// List categories
 router.get('/categories', async (req, res, next) => {
   try {
     const categories = await db.select('categories', {
       orderBy: ['name', 'asc'],
       silent: true
     });
-
-    res.render('admin/categories/list', {
-      title: 'Categories',
-      categories
-    });
+    res.render('admin/categories/list', { title: 'Categories', categories });
   } catch (error) {
+    console.error('Categories list error:', error);
     next(error);
   }
 });
 
-// Create category
 router.post('/categories', isAdmin, async (req, res, next) => {
   try {
     const { name, description, color } = req.body;
-
     const slug = slugify(name, { lower: true, strict: true });
 
     await db.insert('categories', {
@@ -365,25 +418,26 @@ router.post('/categories', isAdmin, async (req, res, next) => {
     req.flash('success', 'Category created!');
     res.redirect('/admin/categories');
   } catch (error) {
+    console.error('Create category error:', error);
     next(error);
   }
 });
 
-// Delete category
 router.delete('/categories/:id', isAdmin, async (req, res, next) => {
   try {
     await db.delete('categories', { id: req.params.id }, { silent: true });
-    
     req.flash('success', 'Category deleted!');
     res.redirect('/admin/categories');
   } catch (error) {
+    console.error('Delete category error:', error);
     next(error);
   }
 });
 
-// ==================== PROFILE ====================
+// ────────────────────────────────────────────────
+// PROFILE ─────────────────────────────────────────
+// ────────────────────────────────────────────────
 
-// Profile page
 router.get('/profile', async (req, res, next) => {
   try {
     const users = await db.select('users', {
@@ -391,20 +445,15 @@ router.get('/profile', async (req, res, next) => {
       silent: true
     });
 
-    if (users.length === 0) {
-      return res.redirect('/auth/logout');
-    }
+    if (users.length === 0) return res.redirect('/auth/logout');
 
-    res.render('admin/profile', {
-      title: 'Profile',
-      user: users[0]
-    });
+    res.render('admin/profile', { title: 'Profile', user: users[0] });
   } catch (error) {
+    console.error('Profile load error:', error);
     next(error);
   }
 });
 
-// Update profile
 router.post('/profile', async (req, res, next) => {
   try {
     const { displayName, bio, email } = req.body;
@@ -415,44 +464,41 @@ router.post('/profile', async (req, res, next) => {
       { silent: true }
     );
 
-    // Update session
     req.session.user.displayName = displayName;
     req.session.user.email = email;
 
     req.flash('success', 'Profile updated!');
     res.redirect('/admin/profile');
   } catch (error) {
+    console.error('Update profile error:', error);
     next(error);
   }
 });
 
-// ==================== FILE UPLOAD ====================
+// ────────────────────────────────────────────────
+// FILE UPLOAD ─────────────────────────────────────
+// ────────────────────────────────────────────────
 
-// Upload image endpoint
-router.post('/upload', upload.single('image'), async (req, res, next) => {
+router.post('/upload', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
     const imageUrl = `/uploads/${req.file.filename}`;
-    
-    res.json({
-      success: true,
-      url: imageUrl,
-      filename: req.file.filename
-    });
+    res.json({ success: true, url: imageUrl, filename: req.file.filename });
   } catch (error) {
+    console.error('Upload error:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Delete uploaded image
-router.delete('/upload/:filename', async (req, res, next) => {
+router.delete('/upload/:filename', async (req, res) => {
   try {
     deleteFile(req.params.filename);
     res.json({ success: true });
   } catch (error) {
+    console.error('Delete file error:', error);
     res.status(500).json({ error: error.message });
   }
 });

@@ -60,7 +60,53 @@
       "foreignKey": "id"
     }
   },
-  "rows": [],
+  "rows": [
+    {
+      "content": "Very clear and helpful intro to Node.js — thank you!",
+      "authorName": "Samuel E.",
+      "authorEmail": "samuel@example.com",
+      "postId": "18790aee-3057-4d70-87b1-0c7103008637",
+      "isApproved": true,
+      "id": "240a930f-4d70-464b-aa36-9aba42bcfce9",
+      "ipAddress": "",
+      "createdAt": "2026-01-22T17:43:21.610Z",
+      "updatedAt": "2026-01-22T17:43:21.610Z"
+    },
+    {
+      "content": "These breakfast ideas are saving my mornings ❤️",
+      "authorName": "Chioma",
+      "authorEmail": "chioma.ng@gmail.com",
+      "postId": "ed5d514b-6691-4dba-bd5e-3e1c54fbdd66",
+      "isApproved": true,
+      "id": "822808b4-0e04-44da-9174-2bf2eeabf5d1",
+      "ipAddress": "",
+      "createdAt": "2026-01-22T17:43:21.622Z",
+      "updatedAt": "2026-01-22T17:43:21.622Z"
+    },
+    {
+      "content": "Great tips! But how do you handle imposter syndrome during interviews?",
+      "authorName": "Tega",
+      "authorEmail": "tega.dev@outlook.com",
+      "postId": "1aec1db8-c159-4890-b4af-c1fef370b515",
+      "isApproved": true,
+      "id": "7a93dec6-a40f-4757-aea9-3e2deae72fa4",
+      "ipAddress": "",
+      "createdAt": "2026-01-22T17:43:21.636Z",
+      "updatedAt": "2026-01-23T12:44:52.853Z"
+    },
+    {
+      "content": "I am very interested in the story",
+      "authorName": "osama",
+      "authorEmail": "osama@akuko.local",
+      "postId": "714b8ca5-e725-4562-bebb-79f1414b9360",
+      "userId": "d04d9b4f-cedd-4123-987f-19ce5eac20ed",
+      "isApproved": true,
+      "ipAddress": "::1",
+      "id": "e6c2f090-7c9b-45a5-8f5c-ef796c50fa57",
+      "createdAt": "2026-01-23T12:52:35.640Z",
+      "updatedAt": "2026-01-23T19:10:19.654Z"
+    }
+  ],
   "indexes": {},
   "options": {
     "encryption": {},

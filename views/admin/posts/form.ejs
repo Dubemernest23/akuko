@@ -113,7 +113,7 @@ You can use Markdown formatting:
                     <h3 class="font-bold mb-4">Tags</h3>
                     <input type="text" 
                            name="tags" 
-                           value="<%= post && post.tags ? post.tags.join(', ') : '' %>"
+                           value="<%= (post && Array.isArray(post.tags) ? post.tags : []).join(', ') %>"
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                            placeholder="tag1, tag2, tag3">
                     <p class="text-xs text-gray-500 mt-2">

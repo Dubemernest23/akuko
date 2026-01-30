@@ -59,6 +59,19 @@ router.get('/', async (req, res, next) => {
       silent: true
     });
 
+    // Normalize tags for all posts
+    posts.forEach(post => {
+      if (typeof post.tags === 'string') {
+        try {
+          post.tags = JSON.parse(post.tags);
+        } catch {
+          post.tags = [];
+        }
+      } else if (!Array.isArray(post.tags)) {
+        post.tags = [];
+      }
+    });
+
     res.render('public/home', {
       title: 'Home',
       posts,
@@ -99,7 +112,17 @@ router.get('/post/:slug', async (req, res, next) => {
     }
 
     const post = posts[0];
-
+    // Parse tags if it's a string
+    if (typeof post.tags === 'string') {
+      try {
+        post.tags = JSON.parse(post.tags);
+      } catch (e) {
+        console.error('Failed to parse tags for post', post.id, e);
+        post.tags = []; // fallback
+      }
+    } else if (!Array.isArray(post.tags)) {
+      post.tags = []; // safety
+    }
     // Increment view count
     await db.update('posts', 
       { views: post.views + 1 },
@@ -182,6 +205,19 @@ router.get('/category/:slug', async (req, res, next) => {
       silent: true
     });
 
+    // Normalize tags for all posts
+    posts.forEach(post => {
+      if (typeof post.tags === 'string') {
+        try {
+          post.tags = JSON.parse(post.tags);
+        } catch {
+          post.tags = [];
+        }
+      } else if (!Array.isArray(post.tags)) {
+        post.tags = [];
+      }
+    });
+
     // Get total count
     const allPosts = await db.select('posts', {
       where: { 
@@ -205,11 +241,64 @@ router.get('/category/:slug', async (req, res, next) => {
 });
 
 // Search
+// router.get('/search', async (req, res, next) => {
+//   try {
+//     const query = req.query.q || '';
+    
+//     if (!query) {
+//       return res.render('public/search', {
+//         title: 'Search',
+//         posts: [],
+//         query: ''
+//       });
+//     }
+
+//     // Search in title and content
+//     const allPosts = await db.select('posts', {
+//       where: { status: 'published' },
+//       join: [{
+//         table: 'users',
+//         on: { local: 'authorId', foreign: 'id' },
+//         as: 'author',
+//         type: 'left'
+//       }],
+//       silent: true
+//     });
+
+//     const posts = allPosts.filter(post => 
+//       post.title.toLowerCase().includes(query.toLowerCase()) ||
+//       post.content.toLowerCase().includes(query.toLowerCase()) ||
+//       (post.tags && post.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase())))
+//     );
+
+//     // Normalize tags for all posts
+//     posts.forEach(post => {
+//       if (typeof post.tags === 'string') {
+//         try {
+//           post.tags = JSON.parse(post.tags);
+//         } catch {
+//           post.tags = [];
+//         }
+//       } else if (!Array.isArray(post.tags)) {
+//         post.tags = [];
+//       }
+//     });
+
+//     res.render('public/search', {
+//       title: `Search: ${query}`,
+//       posts,
+//       query
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
 router.get('/search', async (req, res, next) => {
   try {
     const query = req.query.q || '';
     
-    if (!query) {
+    if (!query.trim()) {
       return res.render('public/search', {
         title: 'Search',
         posts: [],
@@ -217,7 +306,6 @@ router.get('/search', async (req, res, next) => {
       });
     }
 
-    // Search in title and content
     const allPosts = await db.select('posts', {
       where: { status: 'published' },
       join: [{
@@ -229,10 +317,29 @@ router.get('/search', async (req, res, next) => {
       silent: true
     });
 
+    // ─── IMPORTANT: Normalize tags for ALL posts ───
+    allPosts.forEach(post => {
+      if (typeof post.tags === 'string') {
+        try {
+          post.tags = JSON.parse(post.tags);
+        } catch (err) {
+          console.error(`Failed to parse tags for post ${post.id || post.slug}:`, err);
+          post.tags = [];
+        }
+      }
+      // Safety net: make sure it's always an array
+      if (!Array.isArray(post.tags)) {
+        post.tags = [];
+      }
+    });
+
+    // Now .some() will work safely
     const posts = allPosts.filter(post => 
       post.title.toLowerCase().includes(query.toLowerCase()) ||
       post.content.toLowerCase().includes(query.toLowerCase()) ||
-      (post.tags && post.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase())))
+      (post.tags.length > 0 && post.tags.some(tag => 
+        typeof tag === 'string' && tag.toLowerCase().includes(query.toLowerCase())
+      ))
     );
 
     res.render('public/search', {

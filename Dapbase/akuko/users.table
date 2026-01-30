@@ -22,6 +22,10 @@
       "type": "string",
       "required": true
     },
+    "bio": {
+      "type": "string",
+      "default": ""
+    },
     "role": {
       "type": "string",
       "default": "user"
@@ -60,6 +64,45 @@
       "avatar": "/images/default-avatar.png",
       "createdAt": "2026-01-20T23:54:02.342Z",
       "updatedAt": "2026-01-20T23:54:02.343Z"
+    },
+    {
+      "username": "admin",
+      "email": "admin@akuko.local",
+      "displayName": "Administrator",
+      "passwordHash": "$2b$10$fyXZSfNwEb02SpAZDK5BkudtIyxrXnm.OfGqorYovoFHZco7NZod2",
+      "role": "admin",
+      "isActive": true,
+      "avatar": "/images/default-avatar.png",
+      "bio": "something short",
+      "id": "d04d9b4f-cedd-4123-987f-19ce5eac20ed",
+      "createdAt": "2026-01-22T17:22:00.629Z",
+      "updatedAt": "2026-01-22T17:22:00.653Z"
+    },
+    {
+      "username": "johndoe",
+      "email": "john@example.com",
+      "displayName": "John Doe",
+      "passwordHash": "$2b$10$fyXZSfNwEb02SpAZDK5BkudtIyxrXnm.OfGqorYovoFHZco7NZod2",
+      "role": "user",
+      "isActive": true,
+      "bio": "something short",
+      "avatar": "/images/default-avatar.png",
+      "id": "5bfea526-efe5-483a-af4e-2b271f43dc76",
+      "createdAt": "2026-01-22T17:22:00.673Z",
+      "updatedAt": "2026-01-22T17:22:00.673Z"
+    },
+    {
+      "username": "janedoe",
+      "email": "jane@example.com",
+      "displayName": "Jane Doe",
+      "passwordHash": "$2b$10$fyXZSfNwEb02SpAZDK5BkudtIyxrXnm.OfGqorYovoFHZco7NZod2",
+      "role": "user",
+      "isActive": true,
+      "bio": "something short",
+      "avatar": "/images/default-avatar.png",
+      "id": "0eb31c5e-f687-4cc9-9eda-6ff3806e32cf",
+      "createdAt": "2026-01-22T17:22:00.684Z",
+      "updatedAt": "2026-01-22T17:22:00.684Z"
     }
   ],
   "indexes": {

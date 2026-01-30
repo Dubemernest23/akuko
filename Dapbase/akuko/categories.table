@@ -70,6 +70,33 @@
       "id": "8637770e-8cb3-493e-9954-cd6ac2c264f0",
       "createdAt": "2026-01-20T23:24:13.216Z",
       "updatedAt": "2026-01-20T23:24:13.216Z"
+    },
+    {
+      "name": "Lifestyle",
+      "slug": "lifestyle",
+      "color": "#EC4899",
+      "description": "Life, travel, wellness & stories",
+      "id": "5b1873c6-336b-4401-ba13-b2d3b81c4fce",
+      "createdAt": "2026-01-22T17:22:00.696Z",
+      "updatedAt": "2026-01-22T17:22:00.696Z"
+    },
+    {
+      "name": "Education",
+      "slug": "education",
+      "color": "#10B981",
+      "description": "Learning, career & skill development",
+      "id": "2f38bada-090d-4be1-a7d3-536c50e6dda8",
+      "createdAt": "2026-01-22T17:22:00.711Z",
+      "updatedAt": "2026-01-22T17:22:00.711Z"
+    },
+    {
+      "name": "Food",
+      "slug": "food",
+      "color": "#F59E0B",
+      "description": "Recipes, local eats & food culture",
+      "id": "8cce0a04-d940-4d28-858f-4763da18b6b3",
+      "createdAt": "2026-01-22T17:22:00.722Z",
+      "updatedAt": "2026-01-22T17:22:00.722Z"
     }
   ],
   "indexes": {},

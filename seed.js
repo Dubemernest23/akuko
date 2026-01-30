@@ -1,264 +1,251 @@
-// scripts/seed.js - Seed database with sample data
+// scripts/seed.js - Improved database seeder
+const { json } = require('express');
 const db = require('./Dapbase/dapbase.connection');
 const bcrypt = require('bcryptjs');
 
+const SAMPLE_PASSWORD = 'password123';
+
 async function seed() {
-  console.log('🌱 Seeding database...\n');
-  
+  console.log('🌱 Starting database seed...\n');
+  console.log('Using database: akuko\n');
+
   try {
     await db.use('akuko');
-    
-    // Check if data already exists
+
+    // ────────────────────────────────────────────────
+    // 1. Users
+    // ────────────────────────────────────────────────
+    console.log('👤 Checking/creating users...');
+
     const existingUsers = await db.select('users', { silent: true });
-    if (existingUsers.length > 1) {
-      console.log('⚠️  Database already has data. Skipping seed.');
-      return;
+    const usernamesToCreate = ['admin', 'johndoe', 'janedoe'];
+
+    const usersToCreate = usernamesToCreate.filter(
+      u => !existingUsers.some(existing => existing.username === u)
+    );
+
+    if (usersToCreate.length === 0) {
+      console.log('  → All sample users already exist. Skipping.');
+    } else {
+      const passwordHash = await bcrypt.hash(SAMPLE_PASSWORD, 10);
+
+      const userData = [];
+
+      if (usersToCreate.includes('admin')) {
+        userData.push({
+          username: 'admin',
+          email: 'admin@akuko.local',
+          displayName: 'Administrator',
+          passwordHash,
+          role: 'admin',
+          isActive: true,
+          avatar: '/images/default-avatar.png',
+          bio: "something short"
+          // bio intentionally omitted - field does not exist in schema
+        });
+      }
+
+      if (usersToCreate.includes('johndoe')) {
+        userData.push({
+          username: 'johndoe',
+          email: 'john@example.com',
+          displayName: 'John Doe',
+          passwordHash,
+          role: 'user',
+          isActive: true,
+          bio: "something short",
+          avatar: '/images/default-avatar.png'
+        });
+      }
+
+      if (usersToCreate.includes('janedoe')) {
+        userData.push({
+          username: 'janedoe',
+          email: 'jane@example.com',
+          displayName: 'Jane Doe',
+          passwordHash,
+          role: 'user',
+          isActive: true,
+          bio: "something short",
+          avatar: '/images/default-avatar.png'
+        });
+      }
+
+      for (const data of userData) {
+        await db.insert('users', data, { silent: true });
+        console.log(`  Created user: ${data.username}`);
+      }
     }
-    
-    // Create sample users
-    console.log('👥 Creating sample users...');
-    const passwordHash = await bcrypt.hash('password123', 10);
-    
-    const john = await db.insert('users', {
-      username: 'johndoe',
-      email: 'john@example.com',
-      displayName: 'John Doe',
-      passwordHash,
-      bio: 'Tech enthusiast and writer',
-      role: 'user'
-    }, { silent: true });
-    
-    const jane = await db.insert('users', {
-      username: 'janedoe',
-      email: 'jane@example.com',
-      displayName: 'Jane Doe',
-      passwordHash,
-      bio: 'Creative storyteller',
-      role: 'user'
-    }, { silent: true });
-    
-    console.log('✓ Created 2 sample users\n');
-    
-    // Get categories
-    const categories = await db.select('categories', { silent: true });
-    const techCat = categories.find(c => c.slug === 'technology');
-    const lifeCat = categories.find(c => c.slug === 'life');
-    
-    // Create sample posts
-    console.log('📝 Creating sample posts...');
-    
+
+    // Load users for reference
+    const users = await db.select('users', { silent: true });
+    const admin = users.find(u => u.username === 'admin');
+    const john = users.find(u => u.username === 'johndoe');
+    const jane = users.find(u => u.username === 'janedoe');
+
+    // ────────────────────────────────────────────────
+    // 2. Categories
+    // ────────────────────────────────────────────────
+    console.log('\n🏷️  Checking/creating categories...');
+
+    const categorySlugs = ['technology', 'lifestyle', 'education', 'food'];
+    const existingCategories = await db.select('categories', { silent: true });
+    const categoriesToCreate = [];
+
+    const categoryTemplates = [
+      { name: 'Technology', slug: 'technology', color: '#3B82F6', description: 'Tech news, tutorials & tools' },
+      { name: 'Lifestyle',   slug: 'lifestyle',   color: '#EC4899', description: 'Life, travel, wellness & stories' },
+      { name: 'Education',   slug: 'education',   color: '#10B981', description: 'Learning, career & skill development' },
+      { name: 'Food',        slug: 'food',        color: '#F59E0B', description: 'Recipes, local eats & food culture' }
+    ];
+
+    for (const cat of categoryTemplates) {
+      if (!existingCategories.some(c => c.slug === cat.slug)) {
+        categoriesToCreate.push(cat);
+      }
+    }
+
+    let createdCategories = [];
+    if (categoriesToCreate.length > 0) {
+      for (const cat of categoriesToCreate) {
+        const newCat = await db.insert('categories', cat, { silent: true });
+        createdCategories.push(newCat);
+        console.log(`  Created category: ${cat.name}`);
+      }
+    }
+
+    // Final category map
+    const allCategories = [...existingCategories, ...createdCategories];
+    const techCat     = allCategories.find(c => c.slug === 'technology');
+    const lifeCat     = allCategories.find(c => c.slug === 'lifestyle');
+    const eduCat      = allCategories.find(c => c.slug === 'education');
+    const foodCat     = allCategories.find(c => c.slug === 'food');
+
+    // ────────────────────────────────────────────────
+    // 3. Posts
+    // ────────────────────────────────────────────────
+    console.log('\n📝 Checking/creating sample posts...');
+
+    const existingPosts = await db.select('posts', { silent: true });
+    const existingSlugs = new Set(existingPosts.map(p => p.slug));
+
     const samplePosts = [
       {
-        title: 'Getting Started with Node.js',
-        slug: 'getting-started-nodejs',
-        content: `# Getting Started with Node.js
-
-Node.js has revolutionized JavaScript development by bringing it to the server-side. In this post, we'll explore the fundamentals.
-
-## What is Node.js?
-
-Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine. It allows you to run JavaScript on the server.
-
-## Why Use Node.js?
-
-1. **Fast & Scalable** - Non-blocking I/O model
-2. **JavaScript Everywhere** - Same language for frontend and backend
-3. **Large Ecosystem** - npm has millions of packages
-4. **Active Community** - Great support and resources
-
-## Getting Started
-
-\`\`\`bash
-# Install Node.js
-# Download from nodejs.org
-
-# Check installation
-node --version
-npm --version
-\`\`\`
-
-Happy coding! 🚀`,
-        excerpt: 'Learn the basics of Node.js and why it\'s so popular',
-        authorId: john.id,
-        categoryId: techCat ? techCat.id : null,
+        title: 'Getting Started with Node.js in 2025',
+        slug: 'getting-started-nodejs-2025',
+        content: `# Getting Started with Node.js in 2025\n\nNode.js remains one of the most popular runtimes...\n\n(Imagine a long article here with code blocks, lists, etc.)`,
+        excerpt: 'Modern guide to setting up Node.js and building your first API',
+        authorId: john?.id,
+        categoryId: techCat?.id,
+        tags: JSON.stringify(['nodejs', 'javascript', 'backend', 'tutorial']),
         status: 'published',
-        publishedAt: new Date().toISOString(),
-        tags: ['nodejs', 'javascript', 'tutorial']
+        publishedAt: new Date('2025-11-10').toISOString()
       },
       {
-        title: 'My Journey into Web Development',
-        slug: 'journey-web-development',
-        content: `# My Journey into Web Development
-
-Looking back at how I started my career in web development brings back great memories.
-
-## The Beginning
-
-I started with HTML and CSS, building simple websites. It was magical seeing my code come to life in the browser.
-
-## Learning JavaScript
-
-JavaScript was challenging at first, but it opened up a whole new world of possibilities. Interactive websites became possible!
-
-## What I've Learned
-
-- Never stop learning
-- Build projects to practice
-- Join communities
-- Share your knowledge
-- Be patient with yourself
-
-The journey continues... 🌟`,
-        excerpt: 'A personal reflection on becoming a web developer',
-        authorId: jane.id,
-        categoryId: lifeCat ? lifeCat.id : null,
+        title: '10 Healthy Nigerian Breakfast Ideas',
+        slug: 'healthy-nigerian-breakfast-ideas',
+        content: `From akara & pap to oats with tiger nuts...\n\nFull recipes inside!`,
+        excerpt: 'Quick, nutritious breakfasts using local ingredients',
+        authorId: jane?.id,
+        categoryId: foodCat?.id,
+        tags: JSON.stringify(['nigerian-food', 'breakfast', 'healthy', 'recipes']),
         status: 'published',
-        publishedAt: new Date(Date.now() - 86400000).toISOString(),
-        tags: ['career', 'personal', 'webdev']
+        publishedAt: new Date('2025-12-05').toISOString()
       },
       {
-        title: 'Understanding Async/Await in JavaScript',
-        slug: 'async-await-javascript',
-        content: `# Understanding Async/Await
-
-Asynchronous programming can be confusing. Let's demystify async/await!
-
-## Promises First
-
-Before async/await, we had Promises:
-
-\`\`\`javascript
-fetch('/api/data')
-  .then(response => response.json())
-  .then(data => console.log(data))
-  .catch(error => console.error(error));
-\`\`\`
-
-## The Async/Await Way
-
-Much cleaner syntax:
-
-\`\`\`javascript
-async function getData() {
-  try {
-    const response = await fetch('/api/data');
-    const data = await response.json();
-    console.log(data);
-  } catch (error) {
-    console.error(error);
-  }
-}
-\`\`\`
-
-## Key Takeaways
-
-- Use async/await for cleaner code
-- Always handle errors with try/catch
-- Remember async functions return promises
-- await only works inside async functions
-
-Happy coding! ⚡`,
-        excerpt: 'Master asynchronous JavaScript with async/await',
-        authorId: john.id,
-        categoryId: techCat ? techCat.id : null,
+        title: 'How I Prepare for Tech Interviews in Nigeria',
+        slug: 'tech-interview-prep-nigeria-2025',
+        content: `LeetCode patterns, system design tips, behavioral questions...\n\nRealistic roadmap for 2025.`,
+        excerpt: 'Practical guide for landing tech roles in Lagos & beyond',
+        authorId: john?.id,
+        categoryId: eduCat?.id,
+        tags: JSON.stringify(['career', 'interview', 'tech-jobs', 'nigeria']),
         status: 'published',
-        publishedAt: new Date(Date.now() - 172800000).toISOString(),
-        tags: ['javascript', 'async', 'programming']
+        publishedAt: new Date('2026-01-08').toISOString()
       },
       {
-        title: 'Building a Blog with Dapbase',
-        slug: 'building-blog-dapbase',
-        content: `# Building a Blog with Dapbase
-
-Dapbase makes it incredibly easy to build database-driven applications. Here's how I built this blog!
-
-## Why Dapbase?
-
-- **Simple** - No complex setup
-- **File-based** - Your data in readable files
-- **Full-featured** - Schema validation, relationships, joins
-- **Fast** - Perfect for small to medium apps
-
-## Getting Started
-
-\`\`\`javascript
-const db = require('./Dapbase/dapbase.connection.js');
-
-await db.use('blog');
-await db.createTable('posts', {
-  title: { type: 'string', required: true },
-  content: { type: 'text' }
-});
-\`\`\`
-
-## Features I Love
-
-1. Auto-generated timestamps
-2. Built-in validation
-3. Foreign key support
-4. Simple query syntax
-
-Check out Dapbase on npm! 🎉`,
-        excerpt: 'How I built this blog using Dapbase',
-        authorId: john.id,
-        categoryId: techCat ? techCat.id : null,
-        status: 'draft',
-        tags: ['dapbase', 'blog', 'tutorial']
+        title: 'Building This Blog – Behind the Scenes',
+        slug: 'building-this-blog-dapbase',
+        content: `Why I chose Dapbase, architecture decisions, challenges...\n\n(Still a work in progress)`,
+        excerpt: 'How this very blog was built',
+        authorId: admin?.id,
+        categoryId: techCat?.id,
+        tags: JSON.stringify(['dapbase', 'blog', 'development']),
+        status: 'draft'
       }
     ];
-    
-    for (const postData of samplePosts) {
-      await db.insert('posts', postData, { silent: true });
+
+    let postsCreated = 0;
+    for (const post of samplePosts) {
+      if (!existingSlugs.has(post.slug)) {
+        await db.insert('posts', post, { silent: true });
+        postsCreated++;
+        console.log(`  Created post: ${post.title}`);
+      }
     }
-    
-    console.log(`✓ Created ${samplePosts.length} sample posts\n`);
-    
-    // Create sample comments
-    console.log('💬 Creating sample comments...');
-    
+    console.log(`  → ${postsCreated} new posts created`);
+
+    // ────────────────────────────────────────────────
+    // 4. Comments
+    // ────────────────────────────────────────────────
+    console.log('\n💬 Creating sample comments (if needed)...');
+
     const publishedPosts = await db.select('posts', {
       where: { status: 'published' },
       silent: true
     });
-    
-    const sampleComments = [
-      {
-        content: 'Great introduction to Node.js! Very helpful for beginners.',
-        authorName: 'Alice Smith',
-        authorEmail: 'alice@example.com',
-        postId: publishedPosts[0].id,
-        isApproved: true
-      },
-      {
-        content: 'Thanks for sharing your journey! Very inspiring.',
-        authorName: 'Bob Johnson',
-        authorEmail: 'bob@example.com',
-        postId: publishedPosts[1].id,
-        isApproved: true
-      },
-      {
-        content: 'This cleared up so much confusion about async/await!',
-        authorName: 'Charlie Brown',
-        authorEmail: 'charlie@example.com',
-        postId: publishedPosts[2].id,
-        isApproved: false
+
+    if (publishedPosts.length > 0) {
+      const sampleComments = [
+        {
+          content: 'Very clear and helpful intro to Node.js — thank you!',
+          authorName: 'Samuel E.',
+          authorEmail: 'samuel@example.com',
+          postId: publishedPosts[0]?.id,
+          isApproved: true
+        },
+        {
+          content: 'These breakfast ideas are saving my mornings ❤️',
+          authorName: 'Chioma',
+          authorEmail: 'chioma.ng@gmail.com',
+          postId: publishedPosts[1]?.id,
+          isApproved: true
+        },
+        {
+          content: 'Great tips! But how do you handle imposter syndrome during interviews?',
+          authorName: 'Tega',
+          authorEmail: 'tega.dev@outlook.com',
+          postId: publishedPosts[2]?.id,
+          isApproved: false     // pending moderation
+        }
+      ];
+
+      let commentsCreated = 0;
+      for (const comment of sampleComments) {
+        // Simple check to avoid duplicates (not perfect, but good enough for seed)
+        const existing = await db.select('comments', {
+          where: { content: comment.content },
+          silent: true
+        });
+        if (existing.length === 0) {
+          await db.insert('comments', comment, { silent: true });
+          commentsCreated++;
+        }
       }
-    ];
-    
-    for (const comment of sampleComments) {
-      await db.insert('comments', comment, { silent: true });
+      console.log(`  → ${commentsCreated} new comments added`);
     }
-    
-    console.log(`✓ Created ${sampleComments.length} sample comments\n`);
-    
-    console.log('✅ Seeding complete!\n');
-    console.log('Sample login credentials:');
-    console.log('  Username: johndoe or janedoe');
-    console.log('  Password: password123\n');
-    
-  } catch (error) {
-    console.error('❌ Seeding failed:', error.message);
-    throw error;
+
+    // ────────────────────────────────────────────────
+    console.log('\n✅ Seeding finished successfully!\n');
+    console.log('You can now log in with:');
+    console.log('  • admin          /  password123  (admin role)');
+    console.log('  • johndoe        /  password123');
+    console.log('  • janedoe        /  password123\n');
+
+  } catch (err) {
+    console.error('❌ Seeding failed:', err.message);
+    if (err.stack) console.error(err.stack);
+    process.exit(1);
   }
 }
 
